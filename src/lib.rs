@@ -3,7 +3,6 @@ pub mod binary_writers;
 pub mod binary_readers;
 mod binary_test;
 pub mod web_socket;
-use wasm_bindgen::prelude::*;
 
 // Use `wee_alloc` as the global allocator.
 #[global_allocator]

@@ -1,4 +1,5 @@
 use std::fmt;
+use std::ops::{Index, Deref};
 use wasm_bindgen::prelude::wasm_bindgen;
 
 #[derive(Clone)]
@@ -299,6 +300,33 @@ impl fmt::Display for HashValue {
             HashValue::VectorString(x) => write!(f, "VECTOR_STRING {x:?}"),
             _ => write!(f, "undefined"),
         }
+    }
+}
+
+impl<'a> Index<&'a str> for Hash {
+    type Output = HashValue;
+
+    fn index(&self, index: &str) -> &HashValue {
+        match self.get(index) {
+            Some(value) => value,
+            None => panic!("Missing Key {}", index)
+        }
+    }
+}
+
+impl Index<String> for Hash {
+    type Output = HashValue;
+
+    fn index(&self, index: String) -> &HashValue {
+        self.index(index.deref())
+    }
+}
+
+impl<'a> Index<&'a String> for Hash {
+    type Output = HashValue;
+
+    fn index(&self, index: &String) -> &HashValue {
+        self.index(index.deref())
     }
 }
 
