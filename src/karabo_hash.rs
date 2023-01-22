@@ -1,5 +1,7 @@
 use std::fmt;
+use wasm_bindgen::prelude::wasm_bindgen;
 
+#[derive(Clone)]
 pub struct Attribute {
     pub key: String,
     pub value: HashValue,
@@ -14,6 +16,7 @@ impl Attribute {
     }
 }
 
+#[derive(Clone)]
 pub struct Attributes {
     store: Vec<Attribute>
 }
@@ -23,6 +26,25 @@ impl Attributes {
         Attributes {
             store: Vec::new()
         }
+    }
+
+    pub fn keys(&self) -> Vec<String> {
+        if self.store.is_empty() {
+            return Vec::new();
+        }
+        return self.store.iter().map(|x| x.key.clone()).collect::<Vec<String>>();
+    }
+
+    pub fn get_index(&self, index: usize) -> Option<&Attribute> {
+        self.store.get(index)
+    }
+
+    pub fn len(&self) -> usize{
+        self.store.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.store.is_empty()
     }
 
     pub fn get(&self, key: &str) -> Option<&HashValue> {
@@ -62,6 +84,7 @@ impl Attributes {
 }
 
 
+#[derive(Clone)]
 pub struct Node {
     pub key: String,
     pub value: HashValue,
@@ -78,6 +101,8 @@ impl Node {
     }
 }
 
+#[wasm_bindgen]
+#[derive(Clone)]
 pub struct Hash {
     store: Vec<Node>
 }
@@ -89,20 +114,39 @@ impl Hash {
         }
     }
 
+    pub fn keys(&self) -> Vec<String> {
+        if self.store.is_empty() {
+            return Vec::new();
+        }
+        return self.store.iter().map(|x| x.key.clone()).collect::<Vec<String>>();
+    }
+
+    pub fn get_index(&self, index: usize) -> Option<&Node> {
+        self.store.get(index)
+    }
+
+    pub fn len(&self) -> usize{
+        self.store.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.store.is_empty()
+    }
+
     pub fn get(&self, key: &str) -> Option<&HashValue> {
-            if self.store.len() == 0 {
-            return None;
-        }
-        for node in self.store.iter() {
-            if node.key == key {
-                return Some(&node.value);
-            }
-        }
+        if self.store.is_empty() {
         return None;
+    }
+    for node in self.store.iter() {
+        if node.key == key {
+            return Some(&node.value);
+        }
+    }
+    return None;
     }
 
     pub fn get_mut(&mut self, key: &str) -> Option<&mut HashValue> {
-        if self.store.len() == 0 {
+        if self.store.is_empty() {
             return None;
         }
     
@@ -115,7 +159,7 @@ impl Hash {
     }
 
     pub fn get_attributes(&self, key: &str) -> Option<&Attributes> {
-        if self.store.len() == 0 {
+        if self.store.is_empty() {
             return None;
         }
         for node in self.store.iter() {
@@ -127,7 +171,7 @@ impl Hash {
     }
 
     pub fn get_mut_attributes(&mut self, key: &str) -> Option<&mut HashValue> {
-        if self.store.len() == 0 {
+        if self.store.is_empty() {
             return None;
         }
 
@@ -156,6 +200,29 @@ impl Hash {
 
 }
 
+pub struct HashIterator<'a> {
+    hash: &'a Hash,
+    index: usize,
+}
+
+impl<'a> Iterator for HashIterator<'a> {
+    type Item = Node;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let result = self.hash.get_index(self.index);
+        self.index += 1;
+        match result {
+            Some(x) => {
+                self.index += 1;
+                Some(x.clone())
+            },
+            None => None,
+        }
+    }
+
+}
+
+#[derive(Clone)]
 pub struct Schema {
     pub class_id: String,
     pub hash: Hash,
@@ -170,6 +237,8 @@ impl Schema {
     }
 }
 
+
+#[derive(Clone)]
 pub enum HashValue {
     Bool(bool),
     Char(u8),  // a 8 bit char
@@ -230,5 +299,38 @@ impl fmt::Display for HashValue {
             HashValue::VectorString(x) => write!(f, "VECTOR_STRING {x:?}"),
             _ => write!(f, "undefined"),
         }
+    }
+}
+
+pub fn get_hashtype(value: &HashValue) -> u32 {
+    match value {
+        HashValue::Bool(_) => 0,
+        HashValue::Char(_) => 2,
+        HashValue::VectorChar(_) => 3,
+        HashValue::Int8(_) => 4,
+        HashValue::VectorInt8(_) => 5,
+        HashValue::UInt8(_) => 6,
+        HashValue::VectorUInt8(_) => 7,
+        HashValue::Int16(_) => 8,
+        HashValue::VectorInt16(_) => 9,
+        HashValue::UInt16(_) => 10,
+        HashValue::VectorUInt16(_) => 11,
+        HashValue::Int32(_) => 12,
+        HashValue::VectorInt32(_) => 13,
+        HashValue::UInt32(_) => 14,
+        HashValue::VectorUInt32(_) => 15,
+        HashValue::Int64(_) => 16,
+        HashValue::VectorInt64(_) => 17,
+        HashValue::UInt64(_) => 18,
+        HashValue::VectorUInt64(_) => 19,
+        HashValue::Float32(_) => 20,
+        HashValue::VectorFloat32(_) => 21,
+        HashValue::Float64(_) => 22,
+        HashValue::VectorFloat64(_) => 23,
+        HashValue::String(_) => 28,
+        HashValue::VectorString(_) => 29,
+        HashValue::Hash(_) => 30,
+        HashValue::VectorHash(_) => 31,
+        HashValue::Schema(_) => 32,
     }
 }

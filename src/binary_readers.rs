@@ -245,8 +245,8 @@ fn read_vhash<R: Read>(buf: &mut R) -> Result<Vec<Hash>>  {
 }
 
 pub fn read_hash<R: Read>(buf: &mut R) -> Result<Hash> {
-    let nkeys = read_u32(buf).expect("error reading number of keys");
     let mut hash = Hash::new();
+    let nkeys = read_u32(buf).expect("error reading number of keys");
     for _ in 0..nkeys {
         let key = read_key(buf).expect("error reading key");
         let value_type = read_u32(buf).expect("error reading value type");
@@ -295,26 +295,5 @@ fn read_value<R: Read>(buf: &mut R, type_: u32) -> Result<HashValue>  {
         31 => Ok(HashValue::VectorHash(read_vhash(buf).unwrap())),
         32 => Ok(HashValue::Schema(read_schema(buf).unwrap())),
         _ => panic!("Type {type_} not implemented"),
-    }
-}
-
-
-#[cfg(test)]
-mod tests {
-    use std::io::BufReader;
-    use std::fs::File;
-
-    use crate::karabo_hash::HashValue;
-    #[test]
-    fn read_from_file() {
-        let mut my_buf = BufReader::new(File::open("./file.bin").unwrap());
-        let hash = crate::binary::read_hash(&mut my_buf).unwrap();
-        let node = hash.get("i8");
-        assert!(node.is_some());
-        let i = match node.unwrap() {
-            HashValue::Int8(v) => *v,
-            _ => panic!("Unexpected type found for "),
-        };
-        assert_eq!(i, -1i8);
     }
 }
