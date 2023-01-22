@@ -10,12 +10,8 @@ mod tests {
         let hash = crate::binary_readers::read_hash(&mut read_buf).unwrap();
         let keys = hash.keys();
         assert_eq!(keys.len(), 24);
-        let node = hash.get("i8");
-
-        println!("{:?}", &keys);
-        assert!(node.is_some());
-        let i = match node.unwrap() {
-            HashValue::Int8(v) => *v,
+        let i = match hash["i8"] {
+            HashValue::Int8(v) => v,
             _ => panic!("Unexpected type found for key i8"),
         };
         assert_eq!(i, -1i8);
@@ -33,9 +29,7 @@ mod tests {
         let vec = stream.into_inner();
         assert_eq!(size, vec.len());
         let mut read_buf = BufReader::new(vec.as_slice());
-        println!("BUFFFER {}", read_buf.buffer().len());
         let read_hash = crate::binary_readers::read_hash(&mut read_buf).unwrap();
-        println!("BUFFFER {}", read_buf.buffer().len());
         assert_eq!(read_hash.keys().len(), 24);
 
         let keys = hash.keys();
