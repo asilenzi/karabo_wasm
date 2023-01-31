@@ -127,7 +127,7 @@ fn write_vhash<W: Write>(buf: &mut W, value: &Vec<Hash>) -> Result<usize>  {
 
 fn write_schema<W: Write>(buf: &mut W, schema: &Schema) -> Result<usize>  {
     let mut c = Cursor::new(Vec::new());
-    let mut size = write_string(&mut c, &schema.class_id).unwrap();
+    let mut size = write_key(&mut c, &schema.class_id).unwrap();
     size += write_hash(&mut c, &schema.hash).unwrap();
     let size32 = size as u32;
     let mut size2 = buf.write(&size32.to_le_bytes()).unwrap();
@@ -168,8 +168,8 @@ fn write_value<W: Write>(buf: &mut W, value: &HashValue) -> Result<usize>  {
         HashValue::String(x) => write_string(buf, &x),
         HashValue::VectorString(x) => write_vstring(buf, &x),
         HashValue::Hash(x) => write_hash(buf, &x),
-        HashValue::VectorHash(x) => write_vhash(buf, &x),  // TODO: implement vector Hash
-        HashValue::Schema(x) => write_schema(buf, &x),  // TODO: implement schema
+        HashValue::VectorHash(x) => write_vhash(buf, &x),
+        HashValue::Schema(x) => write_schema(buf, &x),
     }
 }
 
@@ -188,7 +188,7 @@ pub fn write_hash<W: Write>(buf: &mut W, hash: &Hash) -> Result<usize> {
         size += buf.write(&nattrs_32.to_le_bytes()).unwrap();
         for attr_index in 0..nattrs {
             let attr = node.attrs.get_index(attr_index).unwrap();
-            let attr_type = get_hashtype(&node.value);
+            let attr_type = get_hashtype(&attr.value);
             size += write_key(buf, &attr.key).unwrap();
             size += buf.write(&attr_type.to_le_bytes()).unwrap();
             size += write_value(buf, &attr.value).unwrap();

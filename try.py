@@ -4,7 +4,12 @@ from copy import deepcopy
 
 import numpy as np
 
-from karabo.native import encodeBinary, Hash
+from karabo.native import encodeBinary, Hash, Configurable, Int32
+
+
+class SimpleSchema(Configurable):
+    i32 = Int32()
+
 
 h = Hash()
 h["i8"] = np.int8(-1)
@@ -33,6 +38,8 @@ h["vstring"] = ["hi"]
 out = deepcopy(h)
 out["node"] = h
 out["vh"] = [h]
+
+out["schema"] = SimpleSchema.getClassSchema()
 
 with open("file.bin", "wb") as f:
     f.write(encodeBinary(out))
