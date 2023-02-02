@@ -1,9 +1,8 @@
-
+use crate::binary_readers::read_hash;
 use std::io::{Cursor, Seek, SeekFrom, Write};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{ErrorEvent, MessageEvent, WebSocket};
-use crate::binary_readers::read_hash;
 
 macro_rules! console_log {
     ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
@@ -32,7 +31,7 @@ pub fn start_websocket(uri: &str) -> Result<(), JsValue> {
             let _array = array.to_vec();
             // here you can for example use Serde Deserialize decode the message
             // for demo purposes we switch back to Blob-type and send off another binary message
-            let size_buf : [u8; 4]= _array[0..4].try_into().unwrap();
+            let size_buf: [u8; 4] = _array[0..4].try_into().unwrap();
             let karabo_len = u32::from_le_bytes(size_buf);
             let mut c = Cursor::new(Vec::new());
             console_log!("Hash of {} bytes was {}", karabo_len, len);
@@ -51,7 +50,7 @@ pub fn start_websocket(uri: &str) -> Result<(), JsValue> {
             let onloadend_cb = Closure::<dyn FnMut(_)>::new(move |_e: web_sys::ProgressEvent| {
                 let array = js_sys::Uint8Array::new(&fr_c.result().unwrap());
                 let _array = array.to_vec();
-                let size_buf : [u8; 4]= _array[0..4].try_into().unwrap();
+                let size_buf: [u8; 4] = _array[0..4].try_into().unwrap();
                 let karabo_len = u32::from_le_bytes(size_buf);
                 let mut c = Cursor::new(Vec::new());
                 console_log!("Hash of {}bytes", karabo_len);

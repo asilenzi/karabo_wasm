@@ -1,6 +1,6 @@
 use std::io::{Cursor, Result, Write};
 
-use crate::karabo_hash::{Hash, Schema, HashValue, get_hashtype};
+use crate::karabo_hash::{get_hashtype, Hash, HashValue, Schema};
 
 fn write_string<W: Write>(buf: &mut W, s: &String) -> Result<usize> {
     let size = s.len() as u32;
@@ -15,7 +15,6 @@ fn write_key<W: Write>(buf: &mut W, s: &String) -> Result<usize> {
     size += buf.write(s.as_bytes()).unwrap();
     Ok(size)
 }
-
 
 fn write_vec_u8<W: Write>(buf: &mut W, value: &Vec<u8>) -> Result<usize> {
     let vsize = value.len() as u32;
@@ -116,16 +115,16 @@ fn write_vstring<W: Write>(buf: &mut W, value: &Vec<String>) -> Result<usize> {
     Ok(size)
 }
 
-fn write_vhash<W: Write>(buf: &mut W, value: &Vec<Hash>) -> Result<usize>  {
+fn write_vhash<W: Write>(buf: &mut W, value: &Vec<Hash>) -> Result<usize> {
     let vsize = value.len() as u32;
     let mut size = buf.write(&vsize.to_le_bytes()).unwrap();
     for el in value {
-        size += write_hash(buf, &el).unwrap();
+        size += write_hash(buf, el).unwrap();
     }
     Ok(size)
 }
 
-fn write_schema<W: Write>(buf: &mut W, schema: &Schema) -> Result<usize>  {
+fn write_schema<W: Write>(buf: &mut W, schema: &Schema) -> Result<usize> {
     let mut c = Cursor::new(Vec::new());
     let mut size = write_key(&mut c, &schema.class_id).unwrap();
     size += write_hash(&mut c, &schema.hash).unwrap();
@@ -135,41 +134,41 @@ fn write_schema<W: Write>(buf: &mut W, schema: &Schema) -> Result<usize>  {
     Ok(size2)
 }
 
-fn write_value<W: Write>(buf: &mut W, value: &HashValue) -> Result<usize>  {
+fn write_value<W: Write>(buf: &mut W, value: &HashValue) -> Result<usize> {
     match value {
         HashValue::Bool(x) => {
             if *x {
-                return buf.write(&[1 as u8]);
+                return buf.write(&[1_u8]);
             }
-            return buf.write(&[0 as u8]);
-        },
+            buf.write(&[0_u8])
+        }
         HashValue::Char(x) => buf.write(&[*x]),
-        HashValue::VectorChar(x) => write_vec_u8(buf, &x),
+        HashValue::VectorChar(x) => write_vec_u8(buf, x),
         HashValue::Int8(x) => buf.write(&[*x as u8]),
-        HashValue::VectorInt8(x) => write_vec_i8(buf, &x),
+        HashValue::VectorInt8(x) => write_vec_i8(buf, x),
         HashValue::UInt8(x) => buf.write(&[*x]),
-        HashValue::VectorUInt8(x) => write_vec_u8(buf, &x),
+        HashValue::VectorUInt8(x) => write_vec_u8(buf, x),
         HashValue::Int16(x) => buf.write(&x.to_le_bytes()),
-        HashValue::VectorInt16(x) => write_vec_i16(buf, &x),
+        HashValue::VectorInt16(x) => write_vec_i16(buf, x),
         HashValue::UInt16(x) => buf.write(&x.to_le_bytes()),
-        HashValue::VectorUInt16(x) => write_vec_u16(buf, &x),
+        HashValue::VectorUInt16(x) => write_vec_u16(buf, x),
         HashValue::Int32(x) => buf.write(&x.to_le_bytes()),
-        HashValue::VectorInt32(x) => write_vec_i32(buf, &x),
+        HashValue::VectorInt32(x) => write_vec_i32(buf, x),
         HashValue::UInt32(x) => buf.write(&x.to_le_bytes()),
-        HashValue::VectorUInt32(x) => write_vec_u32(buf, &x),
+        HashValue::VectorUInt32(x) => write_vec_u32(buf, x),
         HashValue::Int64(x) => buf.write(&x.to_le_bytes()),
-        HashValue::VectorInt64(x) => write_vec_i64(buf, &x),
+        HashValue::VectorInt64(x) => write_vec_i64(buf, x),
         HashValue::UInt64(x) => buf.write(&x.to_le_bytes()),
-        HashValue::VectorUInt64(x) => write_vec_u64(buf, &x),
+        HashValue::VectorUInt64(x) => write_vec_u64(buf, x),
         HashValue::Float32(x) => buf.write(&x.to_le_bytes()),
-        HashValue::VectorFloat32(x) => write_vec_f32(buf, &x),
+        HashValue::VectorFloat32(x) => write_vec_f32(buf, x),
         HashValue::Float64(x) => buf.write(&x.to_le_bytes()),
-        HashValue::VectorFloat64(x) => write_vec_f64(buf, &x),
-        HashValue::String(x) => write_string(buf, &x),
-        HashValue::VectorString(x) => write_vstring(buf, &x),
-        HashValue::Hash(x) => write_hash(buf, &x),
-        HashValue::VectorHash(x) => write_vhash(buf, &x),
-        HashValue::Schema(x) => write_schema(buf, &x),
+        HashValue::VectorFloat64(x) => write_vec_f64(buf, x),
+        HashValue::String(x) => write_string(buf, x),
+        HashValue::VectorString(x) => write_vstring(buf, x),
+        HashValue::Hash(x) => write_hash(buf, x),
+        HashValue::VectorHash(x) => write_vhash(buf, x),
+        HashValue::Schema(x) => write_schema(buf, x),
     }
 }
 
