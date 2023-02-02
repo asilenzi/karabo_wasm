@@ -189,6 +189,12 @@ fn read_i16<R: Read>(buf: &mut R) -> Result<i16> {
     Ok(num)
 }
 
+fn read_char<R: Read>(buf: &mut R) -> Result<char> {
+    let mut buffer = [0u8; 1];
+    buf.read_exact(&mut buffer).expect("error reading value");
+    Ok(buffer[0] as char)
+}
+
 fn read_u8<R: Read>(buf: &mut R) -> Result<u8> {
     let mut buffer = [0u8; 1];
     buf.read_exact(&mut buffer).expect("error reading value");
@@ -288,7 +294,7 @@ pub fn read_hash<R: Read>(buf: &mut R) -> Result<Hash> {
 fn read_value<R: Read>(buf: &mut R, type_: u32) -> Result<HashValue> {
     match type_ {
         0 => Ok(HashValue::Bool(read_bool(buf).unwrap())),
-        2 => Ok(HashValue::Char(read_u8(buf).unwrap())),
+        2 => Ok(HashValue::Char(read_char(buf).unwrap())),
         3 => Ok(HashValue::VectorChar(read_vu8(buf).unwrap())),
         4 => Ok(HashValue::Int8(read_i8(buf).unwrap())),
         5 => Ok(HashValue::VectorInt8(read_vi8(buf).unwrap())),

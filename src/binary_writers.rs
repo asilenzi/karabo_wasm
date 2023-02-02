@@ -142,7 +142,7 @@ fn write_value<W: Write>(buf: &mut W, value: &HashValue) -> Result<usize> {
             }
             buf.write(&[0_u8])
         }
-        HashValue::Char(x) => buf.write(&[*x]),
+        HashValue::Char(x) => buf.write(&[*x as u8]),
         HashValue::VectorChar(x) => write_vec_u8(buf, x),
         HashValue::Int8(x) => buf.write(&[*x as u8]),
         HashValue::VectorInt8(x) => write_vec_i8(buf, x),
