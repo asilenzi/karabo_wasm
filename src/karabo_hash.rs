@@ -12,13 +12,13 @@ impl Attribute {
     #[inline]
     fn new(key: String, value: HashValue) -> Attribute {
         Attribute {
-            key: key,
-            value: value,
+            key,
+            value,
         }
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Attributes {
     store: Vec<Attribute>,
 }
@@ -52,7 +52,7 @@ impl Attributes {
     }
 
     pub fn get(&self, key: &str) -> Option<&HashValue> {
-        if self.store.len() == 0 {
+        if self.store.is_empty() {
             return None;
         }
         for attr in self.store.iter() {
@@ -60,11 +60,11 @@ impl Attributes {
                 return Some(&attr.value);
             }
         }
-        return None;
+        None
     }
 
     pub fn get_mut(&mut self, key: &str) -> Option<&mut HashValue> {
-        if self.store.len() == 0 {
+        if self.store.is_empty() {
             return None;
         }
 
@@ -73,7 +73,7 @@ impl Attributes {
                 return Some(&mut attr.value);
             }
         }
-        return None;
+        None
     }
 
     #[inline]
@@ -96,15 +96,15 @@ pub struct Node {
 impl Node {
     fn new(key: String, value: HashValue, attrs: Attributes) -> Node {
         Node {
-            key: key,
-            value: value,
-            attrs: attrs,
+            key,
+            value,
+            attrs,
         }
     }
 }
 
 #[wasm_bindgen]
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Hash {
     store: Vec<Node>,
 }
@@ -146,7 +146,7 @@ impl Hash {
                 return Some(&node.value);
             }
         }
-        return None;
+        None
     }
 
     pub fn get_mut(&mut self, key: &str) -> Option<&mut HashValue> {
@@ -159,7 +159,7 @@ impl Hash {
                 return Some(&mut node.value);
             }
         }
-        return None;
+        None
     }
 
     pub fn get_attributes(&self, key: &str) -> Option<&Attributes> {
@@ -171,7 +171,7 @@ impl Hash {
                 return Some(&node.attrs);
             }
         }
-        return None;
+        None
     }
 
     pub fn get_mut_attributes(&mut self, key: &str) -> Option<&mut HashValue> {
@@ -184,7 +184,7 @@ impl Hash {
                 return Some(&mut attr.value);
             }
         }
-        return None;
+        None
     }
 
     #[inline]
@@ -233,8 +233,8 @@ pub struct Schema {
 impl Schema {
     pub fn new(class_id: String, hash: Hash) -> Schema {
         Schema {
-            class_id: class_id,
-            hash: hash,
+            class_id,
+            hash,
         }
     }
 }
