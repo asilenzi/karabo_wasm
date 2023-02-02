@@ -11,10 +11,7 @@ pub struct Attribute {
 impl Attribute {
     #[inline]
     fn new(key: String, value: HashValue) -> Attribute {
-        Attribute {
-            key,
-            value,
-        }
+        Attribute { key, value }
     }
 }
 
@@ -95,11 +92,7 @@ pub struct Node {
 
 impl Node {
     fn new(key: String, value: HashValue, attrs: Attributes) -> Node {
-        Node {
-            key,
-            value,
-            attrs,
-        }
+        Node { key, value, attrs }
     }
 }
 
@@ -232,18 +225,15 @@ pub struct Schema {
 
 impl Schema {
     pub fn new(class_id: String, hash: Hash) -> Schema {
-        Schema {
-            class_id,
-            hash,
-        }
+        Schema { class_id, hash }
     }
 }
 
 #[derive(Clone)]
 pub enum HashValue {
     Bool(bool),
-    Char(u8),            // a 8 bit char
-    VectorChar(Vec<u8>), // a 8 bit char
+    Char(char),
+    VectorChar(Vec<u8>),
     UInt8(u8),
     VectorUInt8(Vec<u8>),
     Int8(i8),
@@ -275,7 +265,7 @@ impl fmt::Display for HashValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             HashValue::Bool(x) => write!(f, "BOOL {x}"),
-            HashValue::Char(x) => write!(f, "CHAR {}", *x as char),
+            HashValue::Char(x) => write!(f, "CHAR {x}"),
             HashValue::UInt8(x) => write!(f, "UINT8 {x}"),
             HashValue::VectorUInt8(x) => write!(f, "VECTOR_UINT8 {x:?}"),
             HashValue::Int8(x) => write!(f, "INT8 {x}"),
