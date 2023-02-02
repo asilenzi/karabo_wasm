@@ -1,5 +1,5 @@
 use std::fmt;
-use std::ops::{Index, Deref};
+use std::ops::{Deref, Index};
 use wasm_bindgen::prelude::wasm_bindgen;
 
 #[derive(Clone)]
@@ -13,34 +13,37 @@ impl Attribute {
     fn new(key: String, value: HashValue) -> Attribute {
         Attribute {
             key: key,
-            value: value }
+            value: value,
+        }
     }
 }
 
 #[derive(Clone)]
 pub struct Attributes {
-    store: Vec<Attribute>
+    store: Vec<Attribute>,
 }
 
 impl Attributes {
     pub fn new() -> Self {
-        Attributes {
-            store: Vec::new()
-        }
+        Attributes { store: Vec::new() }
     }
 
     pub fn keys(&self) -> Vec<String> {
         if self.store.is_empty() {
             return Vec::new();
         }
-        return self.store.iter().map(|x| x.key.clone()).collect::<Vec<String>>();
+        return self
+            .store
+            .iter()
+            .map(|x| x.key.clone())
+            .collect::<Vec<String>>();
     }
 
     pub fn get_index(&self, index: usize) -> Option<&Attribute> {
         self.store.get(index)
     }
 
-    pub fn len(&self) -> usize{
+    pub fn len(&self) -> usize {
         self.store.len()
     }
 
@@ -64,7 +67,7 @@ impl Attributes {
         if self.store.len() == 0 {
             return None;
         }
-    
+
         for attr in self.store.iter_mut() {
             if attr.key == key {
                 return Some(&mut attr.value);
@@ -81,15 +84,13 @@ impl Attributes {
     pub(crate) fn insert_index(&mut self, key: &str, value: HashValue) {
         self.store.push(Attribute::new(key.to_string(), value));
     }
-
 }
-
 
 #[derive(Clone)]
 pub struct Node {
     pub key: String,
     pub value: HashValue,
-    pub attrs: Attributes
+    pub attrs: Attributes,
 }
 
 impl Node {
@@ -105,28 +106,30 @@ impl Node {
 #[wasm_bindgen]
 #[derive(Clone)]
 pub struct Hash {
-    store: Vec<Node>
+    store: Vec<Node>,
 }
 
 impl Hash {
     pub fn new() -> Self {
-        Hash {
-            store: Vec::new()
-        }
+        Hash { store: Vec::new() }
     }
 
     pub fn keys(&self) -> Vec<String> {
         if self.store.is_empty() {
             return Vec::new();
         }
-        return self.store.iter().map(|x| x.key.clone()).collect::<Vec<String>>();
+        return self
+            .store
+            .iter()
+            .map(|x| x.key.clone())
+            .collect::<Vec<String>>();
     }
 
     pub fn get_index(&self, index: usize) -> Option<&Node> {
         self.store.get(index)
     }
 
-    pub fn len(&self) -> usize{
+    pub fn len(&self) -> usize {
         self.store.len()
     }
 
@@ -136,21 +139,21 @@ impl Hash {
 
     pub fn get(&self, key: &str) -> Option<&HashValue> {
         if self.store.is_empty() {
-        return None;
-    }
-    for node in self.store.iter() {
-        if node.key == key {
-            return Some(&node.value);
+            return None;
         }
-    }
-    return None;
+        for node in self.store.iter() {
+            if node.key == key {
+                return Some(&node.value);
+            }
+        }
+        return None;
     }
 
     pub fn get_mut(&mut self, key: &str) -> Option<&mut HashValue> {
         if self.store.is_empty() {
             return None;
         }
-    
+
         for node in self.store.iter_mut() {
             if node.key == key {
                 return Some(&mut node.value);
@@ -198,7 +201,6 @@ impl Hash {
     pub(crate) fn insert_index_attrs(&mut self, key: &str, value: HashValue, attrs: Attributes) {
         self.store.push(Node::new(key.to_string(), value, attrs));
     }
-
 }
 
 pub struct HashIterator<'a> {
@@ -216,11 +218,10 @@ impl<'a> Iterator for HashIterator<'a> {
             Some(x) => {
                 self.index += 1;
                 Some(x.clone())
-            },
+            }
             None => None,
         }
     }
-
 }
 
 #[derive(Clone)]
@@ -238,12 +239,11 @@ impl Schema {
     }
 }
 
-
 #[derive(Clone)]
 pub enum HashValue {
     Bool(bool),
-    Char(u8),  // a 8 bit char
-    VectorChar(Vec<u8>),  // a 8 bit char
+    Char(u8),            // a 8 bit char
+    VectorChar(Vec<u8>), // a 8 bit char
     UInt8(u8),
     VectorUInt8(Vec<u8>),
     Int8(i8),
@@ -309,7 +309,7 @@ impl<'a> Index<&'a str> for Hash {
     fn index(&self, index: &str) -> &HashValue {
         match self.get(index) {
             Some(value) => value,
-            None => panic!("Missing Key {}", index)
+            None => panic!("Missing Key {}", index),
         }
     }
 }

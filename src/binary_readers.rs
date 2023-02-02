@@ -1,8 +1,8 @@
 use std::io::{Read, Result};
 
-use crate::karabo_hash::{Attributes, Hash, Schema, HashValue};
+use crate::karabo_hash::{Attributes, Hash, HashValue, Schema};
 
-fn read_vu8<R: Read>(buf: &mut R) -> Result<Vec<u8>>  {
+fn read_vu8<R: Read>(buf: &mut R) -> Result<Vec<u8>> {
     let size_ = read_u32(buf).expect("error reading key size");
     let size = usize::try_from(size_).unwrap();
     let mut arr = vec![0u8; size];
@@ -10,7 +10,7 @@ fn read_vu8<R: Read>(buf: &mut R) -> Result<Vec<u8>>  {
     Ok(arr)
 }
 
-fn read_vi8<R: Read>(buf: &mut R) -> Result<Vec<i8>>  {
+fn read_vi8<R: Read>(buf: &mut R) -> Result<Vec<i8>> {
     let size_ = read_u32(buf).expect("error reading key size");
     let size = usize::try_from(size_).unwrap();
     let mut arr = vec![0u8; size];
@@ -19,185 +19,209 @@ fn read_vi8<R: Read>(buf: &mut R) -> Result<Vec<i8>>  {
     Ok(ret)
 }
 
-fn read_vi16<R: Read>(buf: &mut R) -> Result<Vec<i16>>  {
+fn read_vi16<R: Read>(buf: &mut R) -> Result<Vec<i16>> {
     let size_ = read_u32(buf).expect("error reading key size");
     let size = usize::try_from(size_).unwrap();
     let chunk_size: usize = 2;
     let mut arr = vec![0u8; size * chunk_size];
     buf.read(&mut arr)?;
-    let ret = arr.chunks(chunk_size).map(|chunk| {
-        let sized:[u8; 2] = chunk.try_into().expect("slice with incorrect length");
-        i16::from_le_bytes(sized)
-    }).collect();
+    let ret = arr
+        .chunks(chunk_size)
+        .map(|chunk| {
+            let sized: [u8; 2] = chunk.try_into().expect("slice with incorrect length");
+            i16::from_le_bytes(sized)
+        })
+        .collect();
     Ok(ret)
 }
 
-fn read_vu16<R: Read>(buf: &mut R) -> Result<Vec<u16>>  {
+fn read_vu16<R: Read>(buf: &mut R) -> Result<Vec<u16>> {
     let size_ = read_u32(buf).expect("error reading key size");
     let size = usize::try_from(size_).unwrap();
     let chunk_size: usize = 2;
     let mut arr = vec![0u8; size * chunk_size];
     buf.read(&mut arr)?;
-    let ret = arr.chunks(chunk_size).map(|chunk| {
-        let sized:[u8; 2] = chunk.try_into().expect("slice with incorrect length");
-        u16::from_le_bytes(sized)
-    }).collect();
+    let ret = arr
+        .chunks(chunk_size)
+        .map(|chunk| {
+            let sized: [u8; 2] = chunk.try_into().expect("slice with incorrect length");
+            u16::from_le_bytes(sized)
+        })
+        .collect();
     Ok(ret)
 }
 
-fn read_vi32<R: Read>(buf: &mut R) -> Result<Vec<i32>>  {
+fn read_vi32<R: Read>(buf: &mut R) -> Result<Vec<i32>> {
     let size_ = read_u32(buf).expect("error reading key size");
     let size = usize::try_from(size_).unwrap();
     let chunk_size: usize = 4;
     let mut arr = vec![0u8; size * chunk_size];
     buf.read(&mut arr)?;
-    let ret = arr.chunks(chunk_size).map(|chunk| {
-        let sized:[u8; 4] = chunk.try_into().expect("slice with incorrect length");
-        i32::from_le_bytes(sized)
-    }).collect();
+    let ret = arr
+        .chunks(chunk_size)
+        .map(|chunk| {
+            let sized: [u8; 4] = chunk.try_into().expect("slice with incorrect length");
+            i32::from_le_bytes(sized)
+        })
+        .collect();
     Ok(ret)
 }
 
-fn read_vu32<R: Read>(buf: &mut R) -> Result<Vec<u32>>  {
+fn read_vu32<R: Read>(buf: &mut R) -> Result<Vec<u32>> {
     let size_ = read_u32(buf).expect("error reading key size");
     let size = usize::try_from(size_).unwrap();
     let chunk_size: usize = 4;
     let mut arr = vec![0u8; size * chunk_size];
     buf.read(&mut arr)?;
-    let ret = arr.chunks(chunk_size).map(|chunk| {
-        let sized:[u8; 4] = chunk.try_into().expect("slice with incorrect length");
-        u32::from_le_bytes(sized)
-    }).collect();
+    let ret = arr
+        .chunks(chunk_size)
+        .map(|chunk| {
+            let sized: [u8; 4] = chunk.try_into().expect("slice with incorrect length");
+            u32::from_le_bytes(sized)
+        })
+        .collect();
     Ok(ret)
 }
 
-fn read_vi64<R: Read>(buf: &mut R) -> Result<Vec<i64>>  {
+fn read_vi64<R: Read>(buf: &mut R) -> Result<Vec<i64>> {
     let size_ = read_u32(buf).expect("error reading key size");
     let size = usize::try_from(size_).unwrap();
     let chunk_size: usize = 8;
     let mut arr = vec![0u8; size * chunk_size];
     buf.read(&mut arr)?;
-    let ret = arr.chunks(chunk_size).map(|chunk| {
-        let sized:[u8; 8] = chunk.try_into().expect("slice with incorrect length");
-        i64::from_le_bytes(sized)
-    }).collect();
+    let ret = arr
+        .chunks(chunk_size)
+        .map(|chunk| {
+            let sized: [u8; 8] = chunk.try_into().expect("slice with incorrect length");
+            i64::from_le_bytes(sized)
+        })
+        .collect();
     Ok(ret)
 }
 
-fn read_vu64<R: Read>(buf: &mut R) -> Result<Vec<u64>>  {
+fn read_vu64<R: Read>(buf: &mut R) -> Result<Vec<u64>> {
     let size_ = read_u32(buf).expect("error reading key size");
     let size = usize::try_from(size_).unwrap();
     let chunk_size: usize = 8;
     let mut arr = vec![0u8; size * chunk_size];
     buf.read(&mut arr)?;
-    let ret = arr.chunks(chunk_size).map(|chunk| {
-        let sized:[u8; 8] = chunk.try_into().expect("slice with incorrect length");
-        u64::from_le_bytes(sized)
-    }).collect();
+    let ret = arr
+        .chunks(chunk_size)
+        .map(|chunk| {
+            let sized: [u8; 8] = chunk.try_into().expect("slice with incorrect length");
+            u64::from_le_bytes(sized)
+        })
+        .collect();
     Ok(ret)
 }
 
-fn read_vf32<R: Read>(buf: &mut R) -> Result<Vec<f32>>  {
+fn read_vf32<R: Read>(buf: &mut R) -> Result<Vec<f32>> {
     let size_ = read_u32(buf).expect("error reading key size");
     let size = usize::try_from(size_).unwrap();
     let chunk_size: usize = 4;
     let mut arr = vec![0u8; size * chunk_size];
     buf.read(&mut arr)?;
-    let ret = arr.chunks(chunk_size).map(|chunk| {
-        let sized:[u8; 4] = chunk.try_into().expect("slice with incorrect length");
-        f32::from_le_bytes(sized)
-    }).collect();
+    let ret = arr
+        .chunks(chunk_size)
+        .map(|chunk| {
+            let sized: [u8; 4] = chunk.try_into().expect("slice with incorrect length");
+            f32::from_le_bytes(sized)
+        })
+        .collect();
     Ok(ret)
 }
 
-fn read_vf64<R: Read>(buf: &mut R) -> Result<Vec<f64>>  {
+fn read_vf64<R: Read>(buf: &mut R) -> Result<Vec<f64>> {
     let size_ = read_u32(buf).expect("error reading key size");
     let size = usize::try_from(size_).unwrap();
     let chunk_size: usize = 8;
     let mut arr = vec![0u8; size * chunk_size];
     buf.read(&mut arr)?;
-    let ret = arr.chunks(chunk_size).map(|chunk| {
-        let sized:[u8; 8] = chunk.try_into().expect("slice with incorrect length");
-        f64::from_le_bytes(sized)
-    }).collect();
+    let ret = arr
+        .chunks(chunk_size)
+        .map(|chunk| {
+            let sized: [u8; 8] = chunk.try_into().expect("slice with incorrect length");
+            f64::from_le_bytes(sized)
+        })
+        .collect();
     Ok(ret)
 }
 
-fn read_u64<R: Read>(buf: &mut R) -> Result<u64>  {
+fn read_u64<R: Read>(buf: &mut R) -> Result<u64> {
     let mut buffer = [0u8; 8];
     buf.read(&mut buffer)?;
     let num = u64::from_le_bytes(buffer);
     Ok(num)
 }
 
-fn read_i64<R: Read>(buf: &mut R) -> Result<i64>  {
+fn read_i64<R: Read>(buf: &mut R) -> Result<i64> {
     let mut buffer = [0u8; 8];
     buf.read(&mut buffer)?;
     let num = i64::from_le_bytes(buffer);
     Ok(num)
 }
 
-fn read_u32<R: Read>(buf: &mut R) -> Result<u32>  {
+fn read_u32<R: Read>(buf: &mut R) -> Result<u32> {
     let mut buffer = [0u8; 4];
     buf.read(&mut buffer)?;
     let num = u32::from_le_bytes(buffer);
     Ok(num)
 }
 
-fn read_i32<R: Read>(buf: &mut R) -> Result<i32>  {
+fn read_i32<R: Read>(buf: &mut R) -> Result<i32> {
     let mut buffer = [0u8; 4];
     buf.read(&mut buffer)?;
     let num = i32::from_le_bytes(buffer);
     Ok(num)
 }
 
-fn read_u16<R: Read>(buf: &mut R) -> Result<u16>  {
+fn read_u16<R: Read>(buf: &mut R) -> Result<u16> {
     let mut buffer = [0u8; 2];
     buf.read(&mut buffer)?;
     let num = u16::from_le_bytes(buffer);
     Ok(num)
 }
 
-fn read_i16<R: Read>(buf: &mut R) -> Result<i16>  {
+fn read_i16<R: Read>(buf: &mut R) -> Result<i16> {
     let mut buffer = [0u8; 2];
     buf.read(&mut buffer)?;
     let num = i16::from_le_bytes(buffer);
     Ok(num)
 }
 
-fn read_u8<R: Read>(buf: &mut R) -> Result<u8>  {
+fn read_u8<R: Read>(buf: &mut R) -> Result<u8> {
     let mut buffer = [0u8; 1];
     buf.read(&mut buffer)?;
     Ok(buffer[0])
 }
 
-fn read_i8<R: Read>(buf: &mut R) -> Result<i8>  {
+fn read_i8<R: Read>(buf: &mut R) -> Result<i8> {
     let mut buffer = [0u8; 1];
     buf.read(&mut buffer)?;
     Ok(buffer[0] as i8)
 }
 
-fn read_bool<R: Read>(buf: &mut R) -> Result<bool>  {
+fn read_bool<R: Read>(buf: &mut R) -> Result<bool> {
     let mut buffer = [0u8; 1];
     buf.read(&mut buffer)?;
     Ok(buffer[0] != 0)
 }
 
-fn read_f32<R: Read>(buf: &mut R) -> Result<f32>  {
+fn read_f32<R: Read>(buf: &mut R) -> Result<f32> {
     let mut buffer = [0u8; 4];
     buf.read(&mut buffer)?;
     let num = f32::from_le_bytes(buffer);
     Ok(num)
 }
 
-fn read_f64<R: Read>(buf: &mut R) -> Result<f64>  {
+fn read_f64<R: Read>(buf: &mut R) -> Result<f64> {
     let mut buffer = [0u8; 8];
     buf.read(&mut buffer)?;
     let num = f64::from_le_bytes(buffer);
     Ok(num)
 }
 
-fn read_string<R: Read>(buf: &mut R) -> Result<String>  {
+fn read_string<R: Read>(buf: &mut R) -> Result<String> {
     let size_ = read_u32(buf).expect("error reading key size");
     let size = usize::try_from(size_).unwrap();
     let mut arr = vec![0u8; size];
@@ -206,26 +230,25 @@ fn read_string<R: Read>(buf: &mut R) -> Result<String>  {
     Ok(ret)
 }
 
-pub fn read_schema<R: Read>(buf: &mut R) -> Result<Schema>  {
-    // read a size 
+pub fn read_schema<R: Read>(buf: &mut R) -> Result<Schema> {
+    // read a size
     read_u32(buf).expect("error reading schema size");
     Ok(Schema::new(
         read_key(buf).expect("error reading schema size"),
-        read_hash(buf).expect("error reading schema size")))
+        read_hash(buf).expect("error reading schema size"),
+    ))
 }
 
-fn read_vstring<R: Read>(buf: &mut R) -> Result<Vec<String>>  {
+fn read_vstring<R: Read>(buf: &mut R) -> Result<Vec<String>> {
     let size = read_u32(buf).expect("error reading key size");
     let mut arr = Vec::new();
     for _ in [0..size] {
-        arr.push(
-            read_string(buf).expect("error reading string in vector")
-        );
+        arr.push(read_string(buf).expect("error reading string in vector"));
     }
     Ok(arr)
 }
 
-fn read_key<R: Read>(buf: &mut R) -> Result<String>  {
+fn read_key<R: Read>(buf: &mut R) -> Result<String> {
     let size = read_u8(buf).expect("error reading key size");
     let mut arr = vec![0u8; size.into()];
     buf.read(&mut arr)?;
@@ -233,13 +256,11 @@ fn read_key<R: Read>(buf: &mut R) -> Result<String>  {
     Ok(key_name)
 }
 
-fn read_vhash<R: Read>(buf: &mut R) -> Result<Vec<Hash>>  {
+fn read_vhash<R: Read>(buf: &mut R) -> Result<Vec<Hash>> {
     let size = read_u32(buf).expect("error reading key size");
     let mut arr = Vec::new();
     for _ in [0..size] {
-        arr.push(
-            read_hash(buf).unwrap()
-        );
+        arr.push(read_hash(buf).unwrap());
     }
     Ok(arr)
 }
@@ -264,7 +285,7 @@ pub fn read_hash<R: Read>(buf: &mut R) -> Result<Hash> {
     Ok(hash)
 }
 
-fn read_value<R: Read>(buf: &mut R, type_: u32) -> Result<HashValue>  {
+fn read_value<R: Read>(buf: &mut R, type_: u32) -> Result<HashValue> {
     match type_ {
         0 => Ok(HashValue::Bool(read_bool(buf).unwrap())),
         2 => Ok(HashValue::Char(read_u8(buf).unwrap())),

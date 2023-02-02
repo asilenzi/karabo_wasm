@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use std::io::{Cursor, BufReader};
     use std::fs::File;
+    use std::io::{BufReader, Cursor};
 
     use crate::karabo_hash::HashValue;
     #[test]

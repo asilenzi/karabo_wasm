@@ -1,6 +1,6 @@
-pub mod karabo_hash;
-pub mod binary_writers;
 pub mod binary_readers;
+pub mod binary_writers;
+pub mod karabo_hash;
 pub mod web_socket;
 
 #[cfg(test)]
