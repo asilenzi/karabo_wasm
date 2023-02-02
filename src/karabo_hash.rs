@@ -2,7 +2,7 @@ use std::fmt;
 use std::ops::{Deref, Index};
 use wasm_bindgen::prelude::wasm_bindgen;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Attribute {
     pub key: String,
     pub value: HashValue,
@@ -15,7 +15,7 @@ impl Attribute {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct Attributes {
     store: Vec<Attribute>,
 }
@@ -83,7 +83,35 @@ impl Attributes {
     }
 }
 
-#[derive(Clone)]
+impl PartialEq for Attributes {
+    fn eq(&self, other: &Self) -> bool {
+        if self.len() != other.len() {
+            return false;
+        }
+        let other_keys = other.keys();
+        if self
+            .keys()
+            .iter()
+            .zip(&other_keys)
+            .filter(|&(a, b)| {
+                a != b
+                    && get_hashtype(self.get(a).expect("")) != get_hashtype(other.get(a).expect(""))
+            })
+            .count()
+            != 0
+        {
+            return false;
+        }
+        for key in self.keys() {
+            if self.get(&key) != other.get(&key) {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+#[derive(Clone, Debug)]
 pub struct Node {
     pub key: String,
     pub value: HashValue,
@@ -97,7 +125,7 @@ impl Node {
 }
 
 #[wasm_bindgen]
-#[derive(Clone, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct Hash {
     store: Vec<Node>,
 }
@@ -196,6 +224,37 @@ impl Hash {
     }
 }
 
+impl PartialEq for Hash {
+    fn eq(&self, other: &Self) -> bool {
+        if self.len() != other.len() {
+            return false;
+        }
+        let other_keys = other.keys();
+        if self
+            .keys()
+            .iter()
+            .zip(&other_keys)
+            .filter(|&(a, b)| {
+                a != b
+                    && get_hashtype(self.get(a).expect("")) != get_hashtype(other.get(a).expect(""))
+            })
+            .count()
+            != 0
+        {
+            return false;
+        }
+        for key in self.keys() {
+            if self.get(&key) != other.get(&key) {
+                return false;
+            }
+            if self.get_attributes(&key) != other.get_attributes(&key) {
+                return false;
+            }
+        }
+        true
+    }
+}
+
 pub struct HashIterator<'a> {
     hash: &'a Hash,
     index: usize,
@@ -217,7 +276,7 @@ impl<'a> Iterator for HashIterator<'a> {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Schema {
     pub class_id: String,
     pub hash: Hash,
@@ -229,11 +288,12 @@ impl Schema {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum HashValue {
     Bool(bool),
+    VectorBool(Vec<bool>),
     Char(char),
-    VectorChar(Vec<u8>),
+    VectorChar(Vec<char>),
     UInt8(u8),
     VectorUInt8(Vec<u8>),
     Int8(i8),
@@ -261,11 +321,34 @@ pub enum HashValue {
     Schema(Schema),
 }
 
+impl fmt::Display for Hash {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut result = Ok(());
+        for key in self.keys() {
+            let value = &self[&key];
+            match self.get_attributes(&key) {
+                None => {
+                    result = write!(f, "{} {:?}", key, value);
+                }
+                Some(attrs) => {
+                    result = write!(f, "{} {:?} {:?}", key, value, attrs);
+                }
+            }
+            if result.is_err() {
+                break;
+            }
+        }
+        result
+    }
+}
+
 impl fmt::Display for HashValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             HashValue::Bool(x) => write!(f, "BOOL {x}"),
+            HashValue::VectorBool(x) => write!(f, "VECTOR_BOOL {x:?}"),
             HashValue::Char(x) => write!(f, "CHAR {x}"),
+            HashValue::VectorChar(x) => write!(f, "VECTOR_CHAR {x:?}"),
             HashValue::UInt8(x) => write!(f, "UINT8 {x}"),
             HashValue::VectorUInt8(x) => write!(f, "VECTOR_UINT8 {x:?}"),
             HashValue::Int8(x) => write!(f, "INT8 {x}"),
@@ -323,6 +406,7 @@ impl<'a> Index<&'a String> for Hash {
 pub fn get_hashtype(value: &HashValue) -> u32 {
     match value {
         HashValue::Bool(_) => 0,
+        HashValue::VectorBool(_) => 1,
         HashValue::Char(_) => 2,
         HashValue::VectorChar(_) => 3,
         HashValue::Int8(_) => 4,

@@ -25,6 +25,25 @@ fn write_vec_u8<W: Write>(buf: &mut W, value: &Vec<u8>) -> Result<usize> {
     Ok(size)
 }
 
+fn write_vec_bool<W: Write>(buf: &mut W, value: &Vec<bool>) -> Result<usize> {
+    let vsize = value.len() as u32;
+    let mut size = buf.write(&vsize.to_le_bytes()).unwrap();
+    for el in value {
+        size += buf.write(&u8::from(*el).to_le_bytes()).unwrap();
+    }
+    Ok(size)
+}
+
+fn write_vec_char<W: Write>(buf: &mut W, value: &Vec<char>) -> Result<usize> {
+    let vsize = value.len() as u32;
+    let mut size = buf.write(&vsize.to_le_bytes()).unwrap();
+    for el in value {
+        let a = *el as u8;
+        size += buf.write(&a.to_le_bytes()).unwrap();
+    }
+    Ok(size)
+}
+
 fn write_vec_i8<W: Write>(buf: &mut W, value: &Vec<i8>) -> Result<usize> {
     let vsize = value.len() as u32;
     let mut size = buf.write(&vsize.to_le_bytes()).unwrap();
@@ -142,8 +161,9 @@ fn write_value<W: Write>(buf: &mut W, value: &HashValue) -> Result<usize> {
             }
             buf.write(&[0_u8])
         }
+        HashValue::VectorBool(x) => write_vec_bool(buf, x),
         HashValue::Char(x) => buf.write(&[*x as u8]),
-        HashValue::VectorChar(x) => write_vec_u8(buf, x),
+        HashValue::VectorChar(x) => write_vec_char(buf, x),
         HashValue::Int8(x) => buf.write(&[*x as u8]),
         HashValue::VectorInt8(x) => write_vec_i8(buf, x),
         HashValue::UInt8(x) => buf.write(&[*x]),

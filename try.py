@@ -12,10 +12,12 @@ class SimpleSchema(Configurable):
 
 
 h = Hash()
+h["bool"] = True
+h['vbool'] = [False, True]
 h["i8"] = np.int8(-1)
 h['vi8'] = [np.int8(-1)]
-h["u8"] = np.int8(250)
-h["vu8"] = [np.int8(250)]
+h["u8"] = np.uint8(250)
+h["vu8"] = [np.uint8(250)]
 h["i16"] = np.int16(-200)
 h["vi16"] = [np.int16(-200)]
 h["u16"] = np.uint16(599)
@@ -30,7 +32,7 @@ h["u64"] = np.uint64(12)
 h["vu64"] = [np.uint64(12)]
 h["f32"] = np.float32(12.)
 h["vf32"] = [np.float32(12.)]
-h["f64"] = np.uint64(12)
+h["f64"] = np.float64(200.)
 h["vf64"] = [np.float64(12)]
 h["string"] = "hi"
 h["vstring"] = ["hi"]
