@@ -2,6 +2,24 @@ use std::io::{Read, Result};
 
 use crate::karabo_hash::{Attributes, Hash, HashValue, Schema};
 
+fn read_vbool<R: Read>(buf: &mut R) -> Result<Vec<bool>> {
+    let size_ = read_u32(buf).expect("error reading key size");
+    let size = usize::try_from(size_).unwrap();
+    let mut arr = vec![0u8; size];
+    buf.read_exact(&mut arr).expect("error reading value");
+    let ret = arr.iter().map(|&e| e != 0_u8).collect();
+    Ok(ret)
+}
+
+fn read_vchar<R: Read>(buf: &mut R) -> Result<Vec<char>> {
+    let size_ = read_u32(buf).expect("error reading key size");
+    let size = usize::try_from(size_).unwrap();
+    let mut arr = vec![0u8; size];
+    buf.read_exact(&mut arr).expect("error reading value");
+    let ret = arr.iter().map(|&e| e as char).collect();
+    Ok(ret)
+}
+
 fn read_vu8<R: Read>(buf: &mut R) -> Result<Vec<u8>> {
     let size_ = read_u32(buf).expect("error reading key size");
     let size = usize::try_from(size_).unwrap();
@@ -294,8 +312,9 @@ pub fn read_hash<R: Read>(buf: &mut R) -> Result<Hash> {
 fn read_value<R: Read>(buf: &mut R, type_: u32) -> Result<HashValue> {
     match type_ {
         0 => Ok(HashValue::Bool(read_bool(buf).unwrap())),
+        1 => Ok(HashValue::VectorBool(read_vbool(buf).unwrap())),
         2 => Ok(HashValue::Char(read_char(buf).unwrap())),
-        3 => Ok(HashValue::VectorChar(read_vu8(buf).unwrap())),
+        3 => Ok(HashValue::VectorChar(read_vchar(buf).unwrap())),
         4 => Ok(HashValue::Int8(read_i8(buf).unwrap())),
         5 => Ok(HashValue::VectorInt8(read_vi8(buf).unwrap())),
         6 => Ok(HashValue::UInt8(read_u8(buf).unwrap())),
