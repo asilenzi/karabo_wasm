@@ -99,7 +99,7 @@ impl HashValue {
     }
     pub fn as_hash(&self) -> Option<&Hash> {
         match self {
-            HashValue::Hash(value) => Some(&value),
+            HashValue::Hash(value) => Some(value),
             _ => None,
         }
     }

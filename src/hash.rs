@@ -60,7 +60,7 @@ impl Hash {
         if self.store.is_empty() {
             return None;
         }
-        let parts: Vec<&str> = key.split(".").collect();
+        let parts: Vec<&str> = key.split('.').collect();
         let position = self.key_map.get(parts[0]);
         match position {
             Some(idx) => match &self.store[*idx].value {
