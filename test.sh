@@ -3,5 +3,5 @@ rm *profdata
 export RUSTFLAGS="-C instrument-coverage"
 export TARGET=$(cargo test 2>&1 | grep Running | sed -E 's# +Running .+\((.+)\)#\1#')
 rust-profdata merge -sparse default_*.profraw -o test.profdata
-cargo-cov -- report --ignore-filename-regex='/.cargo/registry' --ignore-filename-regex='/tests' --ignore-filename-regex='/rustc' --object $TARGET --instr-profile=./test.profdata
-cargo-cov -- show --format=html --ignore-filename-regex='/.cargo/registry' --ignore-filename-regex='/tests' --ignore-filename-regex='/rustc' --object $TARGET --instr-profile=./test.profdata > coverage.html
+cargo-cov -- report --ignore-filename-regex='/.cargo/registry' --ignore-filename-regex='/tests' --ignore-filename-regex='/web_socket.rs' --ignore-filename-regex='/rustc' --object $TARGET --instr-profile=./test.profdata
+cargo-cov -- show --format=html --ignore-filename-regex='/.cargo/registry' --ignore-filename-regex='/tests'  --ignore-filename-regex='/web_socket.rs' --ignore-filename-regex='/rustc' --object $TARGET --instr-profile=./test.profdata > coverage.html

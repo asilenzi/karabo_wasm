@@ -97,9 +97,17 @@ impl HashValue {
             _ => None,
         }
     }
+
     pub fn as_hash(&self) -> Option<&Hash> {
         match self {
             HashValue::Hash(value) => Some(value),
+            _ => None,
+        }
+    }
+
+    pub fn as_schema(&self) -> Option<&Schema> {
+        match self {
+            HashValue::Schema(value) => Some(value),
             _ => None,
         }
     }
@@ -132,9 +140,15 @@ impl fmt::Display for HashValue {
             HashValue::VectorFloat32(x) => write!(f, "VECTOR_FLOAT {x:?}"),
             HashValue::Float64(x) => write!(f, "DOUBLE {x}"),
             HashValue::VectorFloat64(x) => write!(f, "VECTOR_DOUBLE {x:?}"),
-            HashValue::String(x) => write!(f, "STRING {x}"),
+            HashValue::String(x) => write!(f, "STRING '{x}'"),
             HashValue::VectorString(x) => write!(f, "VECTOR_STRING {x:?}"),
-            _ => write!(f, "undefined"),
+            HashValue::Hash(x) => write!(f, "HASH {x}"),
+            HashValue::VectorHash(x) => {
+                let ret: Vec<String> = x.iter().map(|hash| format!("{}", hash)).collect();
+                let ret = ret.join(",");
+                write!(f, "VECTOR_HASH [{}]", ret)
+            }
+            HashValue::Schema(x) => write!(f, "SCHEMA ClassId {} {}", x.class_id, x.hash),
         }
     }
 }
