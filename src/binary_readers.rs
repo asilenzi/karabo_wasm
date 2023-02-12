@@ -1,6 +1,9 @@
 use std::io::{Read, Result};
 
-use crate::karabo_hash::{Attributes, Hash, HashValue, Schema};
+use crate::attributes::Attributes;
+use crate::hash::Hash;
+use crate::schema::Schema;
+use crate::types::HashValue;
 
 fn read_vbool<R: Read>(buf: &mut R) -> Result<Vec<bool>> {
     let size_ = read_u32(buf).expect("error reading key size");

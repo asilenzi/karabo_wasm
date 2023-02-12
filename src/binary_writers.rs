@@ -1,6 +1,8 @@
 use std::io::{Cursor, Result, Write};
 
-use crate::karabo_hash::{get_hashtype, Hash, HashValue, Schema};
+use crate::hash::Hash;
+use crate::schema::Schema;
+use crate::types::{get_hashtype, HashValue};
 
 fn write_string<W: Write>(buf: &mut W, s: &String) -> Result<usize> {
     let size = s.len() as u32;
