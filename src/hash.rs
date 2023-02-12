@@ -189,6 +189,15 @@ impl<'a> Iterator for HashIterator<'a> {
     }
 }
 
+impl IntoIterator for Hash {
+    type Item = Node;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.store.into_iter()
+    }
+}
+
 impl<'a> Index<&'a str> for Hash {
     type Output = HashValue;
 
@@ -218,21 +227,19 @@ impl<'a> Index<&'a String> for Hash {
 
 impl fmt::Display for Hash {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut result = Ok(());
-        for key in self.keys() {
-            let value = &self[&key];
-            match self.get_attributes(&key) {
-                None => {
-                    result = write!(f, "{} {:?}", key, value);
-                }
-                Some(attrs) => {
-                    result = write!(f, "{} {:?} {:?}", key, value, attrs);
-                }
-            }
-            if result.is_err() {
-                break;
-            }
-        }
-        result
+        let ret: Vec<String> = self
+            .keys()
+            .iter()
+            .map(|key| {
+                format!(
+                    "'{}' => {} - {}",
+                    key,
+                    self.get(key).unwrap(),
+                    self.get_attributes(key).unwrap()
+                )
+            })
+            .collect();
+        let ret = ret.join("\n");
+        write!(f, "{}", ret)
     }
 }

@@ -1,3 +1,5 @@
+use std::fmt;
+
 use std::collections::HashMap;
 
 use crate::types::{get_hashtype, HashValue};
@@ -95,18 +97,37 @@ impl Attributes {
     }
 }
 
+pub struct AttributesIterator<'a> {
+    attrs: &'a Attributes,
+    index: usize,
+}
+
+impl<'a> Iterator for AttributesIterator<'a> {
+    type Item = Attribute;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let result = self.attrs.get_index(self.index);
+        self.index += 1;
+        match result {
+            Some(x) => {
+                self.index += 1;
+                Some(x.clone())
+            }
+            None => None,
+        }
+    }
+}
+
 impl PartialEq for Attributes {
     fn eq(&self, other: &Self) -> bool {
         if self.len() != other.len() {
             return false;
         }
-        let other_keys = other.keys();
         if self
             .keys()
             .iter()
-            .zip(&other_keys)
-            .filter(|&(a, b)| {
-                a != b
+            .filter(|&a| {
+                other.get(a).is_some()
                     && get_hashtype(self.get(a).expect("")) != get_hashtype(other.get(a).expect(""))
             })
             .count()
@@ -120,5 +141,17 @@ impl PartialEq for Attributes {
             }
         }
         true
+    }
+}
+
+impl fmt::Display for Attributes {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let ret: Vec<String> = self
+            .keys()
+            .iter()
+            .map(|key| format!("'{}' => {}\n", key, &self.get(key).unwrap()))
+            .collect();
+        let ret = ret.join(",");
+        write!(f, "{{{}}}", ret)
     }
 }
