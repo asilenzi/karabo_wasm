@@ -1,6 +1,9 @@
+pub mod attributes;
 pub mod binary_readers;
 pub mod binary_writers;
-pub mod karabo_hash;
+pub mod hash;
+pub mod schema;
+pub mod types;
 pub mod web_socket;
 
 #[cfg(test)]
